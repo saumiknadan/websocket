@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->string('token');
-            $table->integer('connection_id');
-            $table->enum('user_status', ['Offline', 'Online']);
-            $table->string('user_image');
+        Schema::create('chats', function (Blueprint $table) {
+            $table->id();
+            $table->integer('from_user_id');
+            $table->integer('to_user_id');
+            $table->string('chat_message');
+            $table->string('message_status');
+            $table->timestamps();
         });
     }
 
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('chats');
     }
 };
