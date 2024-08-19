@@ -37,7 +37,7 @@
 						@endif
 						<br />
 						@if($row->user_image != '')
-						<img src="{{ asset('images/' . $row->user_image) }}" width="150" class="img-thumbnail" />
+						<img src="{{ asset('websocket/public/images/' . $row->user_image) }}" width="150" class="img-thumbnail" />
 						@endif
 						<input type="hidden" name="hidden_user_image" value="{{ $row->user_image }}" />
 					</div>

@@ -46,6 +46,6 @@ class WebSocketServer extends Command
             8090
         );
 
-        $server->run();
+        $server->run(); 
     }
 }

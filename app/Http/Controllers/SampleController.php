@@ -9,6 +9,8 @@ use Session;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+use Image;
+
 class SampleController extends Controller
 {
     function index()
