@@ -23,6 +23,8 @@ class SampleController extends Controller
 
     function validate_registration(Request $request)
     {
+        // dd($request);
+
         $request->validate([
             'name'         =>   'required',
             'email'        =>   'required|email|unique:users',
@@ -127,3 +129,4 @@ class SampleController extends Controller
         return redirect('profile')->with('success', 'Profile Details Updated');
     }
 }
+  
