@@ -89,6 +89,50 @@
 
 	conn.onmessage = function(e){
 
+		var data = JSON.parse(e.data);
+
+		if(data.response_load_unconnected_user)
+		{
+			var html = '';
+
+			if(data.data.length > 0)
+			{
+				html += '<ul class="list-group">';
+
+				for(var count = 0; count < data.data.length; count++)
+				{
+					var user_image = '';
+
+					if(data.data[count].user_image != '')
+					{
+						user_image = `<img src="{{ asset('websocket/public/images/') }}/`+data.data[count].user_image+`" width="40" class="rounded-circle" />`;
+					}
+					else
+					{
+						user_image = `<img src="{{ asset('websocket/public/images/no-image.jpg') }}" width="40" class="rounded-circle" />`
+					}
+
+					html += `
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col col-9">`+user_image+`&nbsp;`+data.data[count].name+`</div>
+							<div class="col col-3">
+								<button type="button" name="send_request" class="btn btn-primary btn-sm float-end" onclick="send_request(this, `+from_user_id+`, `+data.data[count].id+`)"><i class="fas fa-paper-plane"></i></button>
+							</div>
+						</div>
+					</li>
+					`;
+				}
+
+				html += '</ul>';
+			}
+			else
+			{
+				html = 'No User Found';
+			}
+
+			document.getElementById('search_people_area').innerHTML = html;
+		}
 	}
 
 
