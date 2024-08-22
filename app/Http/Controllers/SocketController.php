@@ -89,13 +89,30 @@ class SocketController extends Controller implements MessageComponentInterface
                 
                 foreach($user_data as $row)
                 {
-                    
-                    $sub_data[] = array(
-                        'name'          => $row['name'],
-                        'id'            => $row['id'],
-                        'status'        => $row['user_status'], 
-                        'user_image'    => $row['user_image']
-                    ); 
+
+                    $chat_request = ChatRequest::select('id')
+                                    ->where(function($query) use ($data, $row){
+                                        $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $row->id);
+                                    })
+                                    ->orWhere(function($query) use ($data, $row){
+                                        $query->where('from_user_id', $row->id)->where('to_user_id', $data->from_user_id);
+                                    })->get();
+
+                    /*
+                    SELECT id FROM chat_request 
+                    WHERE (from_user_id = $data->from_user_id AND to_user_id = $row->id) 
+                    OR (from_user_id = $row->id AND to_user_id = $data->from_user_id)
+                    */
+
+                    if($chat_request->count() == 0)
+                    {
+                        $sub_data[] = array(
+                            'name'  =>  $row['name'],
+                            'id'    =>  $row['id'],
+                            'status'=>  $row['user_status'],
+                            'user_image' => $row['user_image']
+                        );
+                    }
                 }
 
                 $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
