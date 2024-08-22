@@ -80,14 +80,16 @@
 
 	var to_user_id = "";
 
-	conn.onopen = function(e){
+	conn.onopen = function(e)
+	{
 		console.log("connection established");
 
 		load_unconnected_user(from_user_id);
 
 	};
 
-	conn.onmessage = function(e){
+	conn.onmessage = function(e)
+	{
 
 		var data = JSON.parse(e.data);
 
@@ -133,6 +135,13 @@
 
 			document.getElementById('search_people_area').innerHTML = html;
 		}
+
+		// for chat request
+		if(data.response_from_user_chat_request)
+		{
+			search_user(from_user_id, document.getElementById('search_people').value);
+
+		}
 	}
 
 
@@ -145,7 +154,7 @@
 
 		conn.send(JSON.stringify(data));
 	}
-
+	
 	function search_user(from_user_id, search_query)
 	{
 		if(search_query.length > 0)
@@ -162,5 +171,19 @@
 		{
 			load_unconnected_user(from_user_id);
 		}
+	}
+
+	// Code for sending request
+	function send_request(element, from_user_id, to_user_id)
+	{
+		var data = {
+			from_user_id : from_user_id,
+			to_user_id : to_user_id,
+			type : 'request_chat_user'
+		};
+
+		element.disabled = true;
+
+		conn.send(JSON.stringify(data));
 	}
 </script>
