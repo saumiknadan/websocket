@@ -76,6 +76,43 @@ class SocketController extends Controller implements MessageComponentInterface
                 }
 
             }
+
+            if($data->type == 'request_search_user')
+            {
+                $user_data = User::select('id', 'name', 'user_status', 'user_image')
+                                    ->where('id', '!=', $data->from_user_id)
+                                    ->where('name', 'like','%'.$data->search_query.'%')
+                                    ->orderBy('name', 'ASC')
+                                    ->get();
+                                    
+                $sub_data = array();
+                
+                foreach($user_data as $row)
+                {
+                    $sub_data[] = array(
+                        'name'          => $row['name'],
+                        'id'            => $row['id'],
+                        'status'        => $row['user_status'], 
+                        'user_image'    => $row['user_image']
+                    ); 
+                }
+
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+
+                $send_data['data'] = $sub_data;
+
+                $send_data['response_search_user'] = true;
+
+                foreach($this->clients as $client)
+                {
+                    if($client->resourceId == $sender_connection_id[0]->connection_id)
+                    {
+                        $client->send(json_encode($send_data));
+                    }
+                }
+
+            }
+
         }
 
     }

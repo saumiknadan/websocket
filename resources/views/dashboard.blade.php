@@ -91,7 +91,7 @@
 
 		var data = JSON.parse(e.data);
 
-		if(data.response_load_unconnected_user)
+		if(data.response_load_unconnected_user || data.response_search_user)
 		{
 			var html = '';
 
@@ -144,5 +144,23 @@
 		};
 
 		conn.send(JSON.stringify(data));
+	}
+
+	function search_user(from_user_id, search_query)
+	{
+		if(search_query.length > 0)
+		{
+			var data = {
+				from_user_id : from_user_id,
+				search_query : search_query,
+				type : 'request_search_user'
+			};
+
+			conn.send(JSON.stringify(data));
+		}
+		else
+		{
+			load_unconnected_user(from_user_id);
+		}
 	}
 </script>
