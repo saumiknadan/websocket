@@ -155,6 +155,7 @@
 		conn.send(JSON.stringify(data));
 	}
 	
+	// search bar e nam likhle id chole asbe
 	function search_user(from_user_id, search_query)
 	{
 		if(search_query.length > 0)

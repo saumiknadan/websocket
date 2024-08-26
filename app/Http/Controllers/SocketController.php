@@ -43,6 +43,7 @@ class SocketController extends Controller implements MessageComponentInterface
 
         if(isset($data->type))
         {
+            // Sob user gulo load kore.
             if($data->type == 'request_load_unconnected_user')
             {
                 $user_data = User::select('id', 'name', 'user_status', 'user_image')
@@ -77,6 +78,7 @@ class SocketController extends Controller implements MessageComponentInterface
 
             }
 
+            // Loaded user der search kora jai
             if($data->type == 'request_search_user')
             {
                 $user_data = User::select('id', 'name', 'user_status', 'user_image')
@@ -131,6 +133,7 @@ class SocketController extends Controller implements MessageComponentInterface
 
             }
 
+            // chat er jonno req pathano jai
             if($data->type == 'request_chat_user')
             {
                 $chat_request = new ChatRequest;
