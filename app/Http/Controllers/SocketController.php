@@ -232,6 +232,7 @@ class SocketController extends Controller implements MessageComponentInterface
                 }
             }
 
+            // chat approve/disapprove hbe
             if($data->type == 'request_process_chat_request')
             {
                 ChatRequest::where('id', $data->chat_request_id)->update(['status' => $data->action]);
@@ -255,6 +256,74 @@ class SocketController extends Controller implements MessageComponentInterface
                     }
 
                     $client->send(json_encode($send_data));
+                }
+            }
+
+            // Connected chat user er req
+            if($data->type == 'request_connected_chat_user')
+            {
+                $condition_1 = ['from_user_id' => $data->from_user_id, 'to_user_id' => $data->from_user_id];
+
+                $user_id_data = ChatRequest::select('from_user_id', 'to_user_id')
+                                            ->orWhere($condition_1)
+                                            ->where('status', 'Approve')
+                                            ->get();
+
+                /*
+                SELECT from_user id, to_user_id FROM ChatRequest 
+                WHERE (from_user_id = $data->from_user_id OR to_user_id = $data->from_user_id) 
+                AND status = 'Approve'
+                */
+
+                $sub_data = array();
+
+                foreach($user_id_data as $user_id_row)
+                {
+                    $user_id = '';
+
+                    if($user_id_row->from_user_id != $data->from_user_id)
+                    {
+                        $user_id = $user_id_row->from_user_id;
+                    }
+                    else
+                    {
+                        $user_id = $user_id_row->to_user_id;
+                    }
+
+                    $user_data = User::select('id', 'name', 'user_image', 'user_status', 'updated_at')->where('id', $user_id)->first();
+
+                    if(date('Y-m-d') == date('Y-m-d', strtotime($user_data->updated_at)))
+                    {
+                        $last_seen = 'Last Seen At ' . date('H:i', strtotime($user_data->updated_at));
+                    }
+                    else
+                    {
+                        $last_seen = 'Last Seen At ' . date('d/m/Y H:i', strtotime($user_data->updated_at));
+                    }
+
+                    $sub_data[] = array(
+                        'id'    =>  $user_data->id,
+                        'name'  =>  $user_data->name,
+                        'user_image'    =>  $user_data->user_image,
+                        'user_status'   =>  $user_data->user_status,
+                        'last_seen'     =>  $last_seen
+                    );
+
+
+                }
+
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+
+                foreach($this->clients as $client)
+                {
+                    if($client->resourceId == $sender_connection_id[0]->connection_id)
+                    {
+                        $send_data['response_connected_chat_user'] = true;
+
+                        $send_data['data'] = $sub_data;
+
+                        $client->send(json_encode($send_data));
+                    }
                 }
             }
         }

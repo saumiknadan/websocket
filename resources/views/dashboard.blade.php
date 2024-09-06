@@ -88,6 +88,7 @@
 
 		load_unread_notification(from_user_id);
 
+		load_connected_chat_user(from_user_id);	
 
 	};
 
@@ -213,7 +214,57 @@
 		if(data.response_process_chat_request)
 		{
 			load_unread_notification(data.user_id);
+
+			load_connected_chat_user(data.user_id);
+
 		}
+
+		if(data.response_connected_chat_user)
+	{
+		var html = '<div class="list-group">';
+
+		if(data.data.length > 0)
+		{
+			for(var count = 0; count < data.data.length; count++)
+			{
+				html += `
+				<a href="#" class="list-group-item d-flex justify-content-between align-items-start" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
+					<div class="ms-2 me-auto">
+				`;
+
+				var user_image = '';
+
+				if(data.data[count].user_image != '')
+				{
+					user_image = `<img src="{{ asset('websocket/public/images/') }}/`+data.data[count].user_image+`" width="35" class="rounded-circle" />`;
+				}
+				else
+				{
+					user_image = `<img src="{{ asset('websocket/public/images/no-image.jpg') }}" width="35" class="rounded-circle" />`;
+				}
+
+
+
+				html += `
+						&nbsp; `+user_image+`&nbsp;<b>`+data.data[count].name+`</b>
+					</div>
+				</a>
+				`;
+			}
+		}
+		else
+		{
+			html += 'No User Found';
+		}
+
+		html += '</div>';
+
+		document.getElementById('user_list').innerHTML = html;
+
+		check_unread_message();
+	}
+
+
 
 	}
 
@@ -280,6 +331,16 @@
 			to_user_id : to_user_id,
 			action : action,
 			type : 'request_process_chat_request'
+		};
+
+		conn.send(JSON.stringify(data));
+	}
+
+	function load_connected_chat_user(from_user_id)
+	{
+		var data = {
+			from_user_id : from_user_id,
+			type : 'request_connected_chat_user'
 		};
 
 		conn.send(JSON.stringify(data));
