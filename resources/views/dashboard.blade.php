@@ -209,6 +209,12 @@
 
 			document.getElementById('notification_area').innerHTML = html;
 		}
+
+		if(data.response_process_chat_request)
+		{
+			load_unread_notification(data.user_id);
+		}
+
 	}
 
 
@@ -264,5 +270,18 @@
 
 		conn.send(JSON.stringify(data));
 
+	}
+
+	function process_chat_request(chat_request_id, from_user_id, to_user_id, action)
+	{
+		var data = {
+			chat_request_id : chat_request_id,
+			from_user_id : from_user_id,
+			to_user_id : to_user_id,
+			action : action,
+			type : 'request_process_chat_request'
+		};
+
+		conn.send(JSON.stringify(data));
 	}
 </script>
