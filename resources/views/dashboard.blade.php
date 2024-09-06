@@ -345,4 +345,39 @@
 
 		conn.send(JSON.stringify(data));
 	}
+
+	function make_chat_area(user_id, to_user_name)
+	{
+		var html = `
+		<div id="chat_history"></div>
+		<div class="input-group mb-3">
+			<div id="message_area" class="form-control" contenteditable style="min-height:125px; border:1px solid #ccc; border-radius:5px;"></div>
+			<label class="btn btn-warning" style="line-height:125px;">
+				<i class="fas fa-upload"></i> <input type="file" id="browse_image" onchange="upload_image()" hidden />
+			</label>
+			<button type="button" class="btn btn-success" id="send_button" onclick="send_chat_message()"><i class="fas fa-paper-plane"></i></button>
+		</div>
+		`;
+
+		document.getElementById('chat_area').innerHTML = html;
+
+		document.getElementById('chat_header').innerHTML = 'Chat with <b>'+to_user_name+'</b>';
+
+		document.getElementById('close_chat_area').innerHTML = '<button type="button" id="close_chat" class="btn btn-danger btn-sm float-end" onclick="close_chat();"><i class="fas fa-times"></i></button>';
+
+		to_user_id = user_id;
+	}
+
+	function close_chat()
+{
+	document.getElementById('chat_header').innerHTML = 'Chat Area';
+
+	document.getElementById('close_chat_area').innerHTML = '';
+
+	document.getElementById('chat_area').innerHTML = '';
+
+	to_user_id = '';
+}
+
+
 </script>
