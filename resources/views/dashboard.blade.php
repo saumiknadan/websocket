@@ -220,49 +220,92 @@
 		}
 
 		if(data.response_connected_chat_user)
-	{
-		var html = '<div class="list-group">';
-
-		if(data.data.length > 0)
 		{
-			for(var count = 0; count < data.data.length; count++)
+			var html = '<div class="list-group">';
+
+			if(data.data.length > 0)
 			{
-				html += `
-				<a href="#" class="list-group-item d-flex justify-content-between align-items-start" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
-					<div class="ms-2 me-auto">
-				`;
-
-				var user_image = '';
-
-				if(data.data[count].user_image != '')
+				for(var count = 0; count < data.data.length; count++)
 				{
-					user_image = `<img src="{{ asset('websocket/public/images/') }}/`+data.data[count].user_image+`" width="35" class="rounded-circle" />`;
-				}
-				else
-				{
-					user_image = `<img src="{{ asset('websocket/public/images/no-image.jpg') }}" width="35" class="rounded-circle" />`;
-				}
+					html += `
+					<a href="#" class="list-group-item d-flex justify-content-between align-items-start" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
+						<div class="ms-2 me-auto">
+					`;
+
+					var user_image = '';
+
+					if(data.data[count].user_image != '')
+					{
+						user_image = `<img src="{{ asset('websocket/public/images/') }}/`+data.data[count].user_image+`" width="35" class="rounded-circle" />`;
+					}
+					else
+					{
+						user_image = `<img src="{{ asset('websocket/public/images/no-image.jpg') }}" width="35" class="rounded-circle" />`;
+					}
 
 
+
+					html += `
+							&nbsp; `+user_image+`&nbsp;<b>`+data.data[count].name+`</b>
+						</div>
+					</a>
+					`;
+				}
+			}
+			else
+			{
+				html += 'No User Found';
+			}
+
+			html += '</div>';
+
+			document.getElementById('user_list').innerHTML = html;
+
+			check_unread_message();
+		}
+
+		if(data.message)
+		{
+			var html = '';
+
+			if(data.from_user_id == from_user_id)
+			{
+				var icon_style = '';
 
 				html += `
-						&nbsp; `+user_image+`&nbsp;<b>`+data.data[count].name+`</b>
+				<div class="row">
+					<div class="col col-3">&nbsp;</div>
+					<div class="col col-9 alert alert-success text-dark shadow-sm">
+						`+data.message+ icon_style +`
 					</div>
-				</a>
+				</div>
 				`;
 			}
+			else
+			{
+					html += `
+					<div class="row">
+						<div class="col col-9 alert alert-light text-dark shadow-sm">
+						`+data.message+ icon_style +`
+						</div>
+					</div>
+					`;
+
+					
+								
+			}
+
+			if(html != '')
+			{
+				var previous_chat_element = document.querySelector('#chat_history');
+
+				var chat_history_element = document.querySelector('#chat_history');
+
+				chat_history_element.innerHTML = previous_chat_element.innerHTML + html;
+				
+			}
+			
 		}
-		else
-		{
-			html += 'No User Found';
-		}
-
-		html += '</div>';
-
-		document.getElementById('user_list').innerHTML = html;
-
-		check_unread_message();
-	}
 
 
 
@@ -369,15 +412,35 @@
 	}
 
 	function close_chat()
-{
-	document.getElementById('chat_header').innerHTML = 'Chat Area';
+	{
+		document.getElementById('chat_header').innerHTML = 'Chat Area';
 
-	document.getElementById('close_chat_area').innerHTML = '';
+		document.getElementById('close_chat_area').innerHTML = '';
 
-	document.getElementById('chat_area').innerHTML = '';
+		document.getElementById('chat_area').innerHTML = '';
 
-	to_user_id = '';
-}
+		to_user_id = '';
+	}
+
+	function send_chat_message()
+	{
+		document.querySelector('#send_button').disabled = true;
+
+		var message = document.getElementById('message_area').innerHTML.trim();
+
+		var data = {
+			message : message,
+			from_user_id : from_user_id,
+			to_user_id : to_user_id,
+			type : 'request_send_message'
+		};
+
+		conn.send(JSON.stringify(data));
+
+		document.querySelector('#message_area').innerHTML = '';
+
+		document.querySelector('#send_button').disabled = false;
+	}
 
 
 </script>
