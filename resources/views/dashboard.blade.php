@@ -306,7 +306,47 @@
 			}
 			
 		}
+		
+		if(data.chat_history)
+		{
+			var html = '';
 
+			for(var count = 0; count < data.chat_history.length; count++)
+			{
+				if(data.chat_history[count].from_user_id == from_user_id)
+				{
+					
+					html +=`
+					<div class="row">
+						<div class="col col-3">&nbsp;</div>
+						<div class="col col-9 alert alert-success text-dark shadow-sm">
+						`+data.chat_history[count].chat_message+  `
+						</div>
+					</div>
+					`;
+
+					
+				}
+				else
+				{
+					
+
+					html += `
+					<div class="row">
+						<div class="col col-9 alert alert-light text-dark shadow-sm">
+						`+data.chat_history[count].chat_message+`
+						</div>
+					</div>
+					`;
+
+					
+				}
+			}
+
+			document.querySelector('#chat_history').innerHTML = html;
+
+			scroll_top();
+		}
 
 
 	}
@@ -440,6 +480,17 @@
 		document.querySelector('#message_area').innerHTML = '';
 
 		document.querySelector('#send_button').disabled = false;
+	}
+
+	function load_chat_data(from_user_id, to_user_id)
+	{
+		var data = {
+			from_user_id : from_user_id,
+			to_user_id : to_user_id,
+			type : 'request_chat_history'
+		};
+
+		conn.send(JSON.stringify(data));
 	}
 
 

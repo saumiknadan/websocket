@@ -377,6 +377,37 @@ class SocketController extends Controller implements MessageComponentInterface
                     }
                 }
             }
+
+            if($data->type == 'request_chat_history')
+            {
+                $chat_data = Chat::select('id', 'from_user_id', 'to_user_id', 'chat_message', 'message_status')
+                                    ->where(function($query) use ($data){
+                                        $query->where('from_user_id', $data->from_user_id)->where('to_user_id', $data->to_user_id);
+                                    })
+                                    ->orWhere(function($query) use ($data){
+                                        $query->where('from_user_id', $data->to_user_id)->where('to_user_id', $data->from_user_id);
+                                    })->orderBy('id', 'ASC')->get();
+                /*
+                SELECT id, from_user_id, to_user_id, chat_message, message status 
+                FROM chats 
+                WHERE (from_user_id = $data->from_user_id AND to_user_id = $data->to_user_id) 
+                OR (from_user_id = $data->to_user_id AND to_user_id = $data->from_user_id)
+                ORDER BY id ASC
+                */
+
+                $send_data['chat_history'] = $chat_data;
+
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get();
+
+                foreach($this->clients as $client)
+                {
+                    if($client->resourceId == $receiver_connection_id[0]->connection_id)
+                    {
+                        $client->send(json_encode($send_data));
+                    }
+                }
+
+            }
         }
 
     }
