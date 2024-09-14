@@ -297,15 +297,23 @@
 			}
 			else
 			{
+				if(to_user_id != '')
+				{
 					html += `
 					<div class="row">
 						<div class="col col-9 alert alert-light text-dark shadow-sm">
-						`+data.message+ icon_style +`
+						`+data.message+`
 						</div>
 					</div>
 					`;
 
-					
+					update_message_status(data.chat_message_id, from_user_id, to_user_id, 'Read');
+				}
+
+				else
+				{
+
+				}
 								
 			}
 
@@ -359,7 +367,10 @@
 				}
 				else
 				{
-					
+					if(data.chat_history[count].message_status != 'Read')
+					{
+						update_message_status(data.chat_history[count].id, data.chat_history[count].from_user_id, data.chat_history[count].to_user_id, 'Read');
+					}
 
 					html += `
 					<div class="row">
@@ -368,14 +379,29 @@
 						</div>
 					</div>
 					`;
-
-					
 				}
 			}
 
 			document.querySelector('#chat_history').innerHTML = html;
 
 			scroll_top();
+		}
+
+		if(data.update_message_status)
+		{
+			var chat_status_element = document.querySelector('#chat_status_'+data.chat_message_id+'');
+
+			if(chat_status_element)
+			{
+				if(data.update_message_status == 'Read')
+				{
+					chat_status_element.innerHTML = '<i class="fas fa-check-double text-primary"></i>';
+				}
+				if(data.update_message_status == 'Send')
+				{
+					chat_status_element.innerHTML = '<i class="fas fa-check-double text-muted"></i>';
+				}
+			}
 		}
 
 
@@ -523,5 +549,17 @@
 		conn.send(JSON.stringify(data));
 	}
 
+	function update_message_status(chat_message_id, from_user_id, to_user_id, chat_message_status)
+	{
+		var data = {
+			chat_message_id : chat_message_id,
+			from_user_id : from_user_id,
+			to_user_id : to_user_id,
+			chat_message_status : chat_message_status,
+			type : 'update_chat_status'
+		};
+
+		conn.send(JSON.stringify(data));
+	}
 
 </script>
