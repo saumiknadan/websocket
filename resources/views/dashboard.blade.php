@@ -272,6 +272,20 @@
 			{
 				var icon_style = '';
 
+				if(data.message_status == 'Not Send')
+				{
+					icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check text-muted"></i></span>';
+				}
+				if(data.message_status == 'Send')
+				{
+					icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check-double text-muted"></i></span>';
+				}
+
+				if(data.message_status == 'Read')
+				{
+					icon_style = '<span class="text-primary float-end" id="chat_status_'+data.chat_message_id+'"><i class="fas fa-check-double"></i></span>';
+				}
+
 				html += `
 				<div class="row">
 					<div class="col col-3">&nbsp;</div>
@@ -315,12 +329,28 @@
 			{
 				if(data.chat_history[count].from_user_id == from_user_id)
 				{
+					var icon_style = '';
+
+					if(data.chat_history[count].message_status == 'Not Send')
+					{
+						icon_style = '<span id="chat_status_'+data.chat_history[count].id+'" class="float-end"><i class="fas fa-check text-muted"></i></span>';
+					}
+
+					if(data.chat_history[count].message_status == 'Send')
+					{
+						icon_style = '<span id="chat_status_'+data.chat_history[count].id+'" class="float-end"><i class="fas fa-check-double text-muted"></i></span>';
+					}
+
+					if(data.chat_history[count].message_status == 'Read')
+					{
+						icon_style = '<span class="text-primary float-end" id="chat_status_'+data.chat_history[count].id+'"><i class="fas fa-check-double"></i></span>';
+					}
 					
 					html +=`
 					<div class="row">
 						<div class="col col-3">&nbsp;</div>
 						<div class="col col-9 alert alert-success text-dark shadow-sm">
-						`+data.chat_history[count].chat_message+  `
+						`+data.chat_history[count].chat_message+ icon_style +`
 						</div>
 					</div>
 					`;
