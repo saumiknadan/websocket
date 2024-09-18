@@ -306,6 +306,7 @@ class SocketController extends Controller implements MessageComponentInterface
 
                     $user_data = User::select('id', 'name', 'user_image', 'user_status', 'updated_at')->where('id', $user_id)->first();
 
+                    // Last seen status
                     if(date('Y-m-d') == date('Y-m-d', strtotime($user_data->updated_at)))
                     {
                         $last_seen = 'Last Seen At ' . date('H:i', strtotime($user_data->updated_at));
@@ -503,11 +504,23 @@ class SocketController extends Controller implements MessageComponentInterface
         {
             User::where('token', $queryarray['token'])->update([ 'connection_id' => 0, 'user_status' => 'Offline' ]);
 
-            $user_id = User::select('id')->where('token', $queryarray['token'])->get();
+            $user_id = User::select('id', 'updated_at')->where('token', $queryarray['token'])->get();
 
             $data['id'] = $user_id[0]->id;
 
             $data['status'] = 'Offline';
+
+            $updated_at = $user_data[0] -> updated_at;
+
+            if(date('Y-m-d') == date('Y-m-d', strtotime($updated_at))) //Same Date, so display only Time
+            {
+                $data['last_seen'] = 'Last Seen at ' . date('H:i');
+            }
+            else
+            {
+                $data['last_seen'] = 'Last Seen at ' . date('d/m/Y H:i');
+            }
+
 
             foreach($this->clients as $client)
             {

@@ -111,6 +111,7 @@
 
 						online_status_icon[count].classList.remove('text-danger');
 
+						document.getElementById('last_seen_'+data.id+'').innerHTML = 'Online';
 					}
 					else
 					{
@@ -118,6 +119,7 @@
 
 						online_status_icon[count].classList.remove('text-success');
 
+						document.getElementById('last_seen_'+data.id+'').innerHTML = data.last_seen;
 					}
 				}
 			}
@@ -258,16 +260,19 @@
 						<div class="ms-2 me-auto">
 					`;
 
+					var last_seen = '';
 
 					if(data.data[count].user_status == 'Online')
 					{
 						html += '<span class="text-success online_status_icon" id="status_'+data.data[count].id+'"><i class="fas fa-circle"></i></span>';
 
+						last_seen = 'Online';
 					}
 					else
 					{
 						html += '<span class="text-danger online_status_icon" id="status_'+data.data[count].id+'"><i class="fas fa-circle"></i></span>';
 
+						last_seen = data.data[count].last_seen;
 					}
 
 					var user_image = '';
@@ -285,6 +290,7 @@
 
 					html += `
 							&nbsp; `+user_image+`&nbsp;<b>`+data.data[count].name+`</b>
+							<div class="text-right"><small class="text-muted last_seen" id="last_seen_`+data.data[count].id+`">`+last_seen+`</small></div>
 						</div>
 						<span class="user_unread_message" data-id="`+data.data[count].id+`" id="user_unread_message_`+data.data[count].id+`"></span>
 					</a>
