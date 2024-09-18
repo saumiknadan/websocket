@@ -97,6 +97,13 @@
 
 		var data = JSON.parse(e.data);
 
+		if(data.image_link)
+		{
+			//Display Code for uploaded Image
+
+			document.getElementById('message_area').innerHTML = `<img src="{{ asset('websocket/public/images/`+data.image_link+`') }}" class="img-thumbnail img-fluid" />`;
+		}
+
 		if(data.status)
 		{
 			var online_status_icon = document.getElementsByClassName('online_status_icon');
@@ -654,6 +661,42 @@
 
 			conn.send(JSON.stringify(data));
 		}
+	}
+
+	function upload_image()
+	{
+		var file_element = document.getElementById('browse_image').files[0];
+
+		var file_name = file_element.name;
+
+		var file_extension = file_name.split('.').pop().toLowerCase();
+
+		var allowed_extension = ['png', 'jpg'];
+
+		if(allowed_extension.indexOf(file_extension) == -1)
+		{
+			alert("Invalid Image File");
+
+			return false;
+		}
+
+		var file_reader = new FileReader();
+
+		var file_raw_data = new ArrayBuffer();
+
+		file_reader.loadend = function()
+		{
+
+		}
+
+		file_reader.onload = function(event){
+
+			file_raw_data = event.target.result;
+
+			conn.send(file_raw_data);
+		}
+
+		file_reader.readAsArrayBuffer(file_element);
 	}
 
 </script>

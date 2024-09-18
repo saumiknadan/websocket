@@ -53,6 +53,25 @@ class SocketController extends Controller implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $conn, $msg)
     {
+        if(preg_match('~[^\x20-\x7E\t\r\n]~', $msg) > 0)
+        {
+            //receiver image in binary string message
+
+            $image_name = time() . '.jpg';
+
+            file_put_contents(public_path('images/') . $image_name, $msg);
+
+            $send_data['image_link'] = $image_name;
+
+            foreach($this->clients as $client)
+            {
+                if($client->resourceId == $conn->resourceId)
+                {
+                    $client->send(json_encode($send_data));
+                }
+            }
+        }
+
         $data = json_decode($msg);
 
         if(isset($data->type))
