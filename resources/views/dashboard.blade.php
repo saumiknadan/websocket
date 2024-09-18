@@ -97,6 +97,32 @@
 
 		var data = JSON.parse(e.data);
 
+		if(data.status)
+		{
+			var online_status_icon = document.getElementsByClassName('online_status_icon');
+
+			for(var count = 0; count < online_status_icon.length; count++)
+			{
+				if(online_status_icon[count].id == 'status_'+data.id)
+				{
+					if(data.status == 'Online')
+					{
+						online_status_icon[count].classList.add('text-success');
+
+						online_status_icon[count].classList.remove('text-danger');
+
+					}
+					else
+					{
+						online_status_icon[count].classList.add('text-danger');
+
+						online_status_icon[count].classList.remove('text-success');
+
+					}
+				}
+			}
+		}
+		
 		if(data.response_load_unconnected_user || data.response_search_user)
 		{
 			var html = '';
@@ -231,6 +257,18 @@
 					<a href="#" class="list-group-item d-flex justify-content-between align-items-start" onclick="make_chat_area(`+data.data[count].id+`, '`+data.data[count].name+`'); load_chat_data(`+from_user_id+`, `+data.data[count].id+`); ">
 						<div class="ms-2 me-auto">
 					`;
+
+
+					if(data.data[count].user_status == 'Online')
+					{
+						html += '<span class="text-success online_status_icon" id="status_'+data.data[count].id+'"><i class="fas fa-circle"></i></span>';
+
+					}
+					else
+					{
+						html += '<span class="text-danger online_status_icon" id="status_'+data.data[count].id+'"><i class="fas fa-circle"></i></span>';
+
+					}
 
 					var user_image = '';
 

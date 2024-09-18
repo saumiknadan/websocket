@@ -33,7 +33,21 @@ class SocketController extends Controller implements MessageComponentInterface
 
         if(isset($queryarray['token']))
         {
-            User::where('token', $queryarray['token'])->update([ 'connection_id' => $conn->resourceId ]);
+            User::where('token', $queryarray['token'])->update([ 'connection_id' => $conn->resourceId, 'user_status' => 'Online' ]);
+
+            $user_id = User::select('id')->where('token', $queryarray['token'])->get();
+
+            $data['id'] = $user_id[0]->id;
+
+            $data['status'] = 'Online';
+
+            foreach($this->clients as $client)
+            {
+                if($client->resourceId != $conn->resourceId)
+                {
+                    $client->send(json_encode($data));
+                }
+            }
         }
     }
 
@@ -480,16 +494,29 @@ class SocketController extends Controller implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         $this->clients->detach($conn);
-        
+
         $querystring = $conn->httpRequest->getUri()->getQuery();
 
         parse_str($querystring, $queryarray);
 
         if(isset($queryarray['token']))
         {
-            User::where('token' , $queryarray['token'])->update([ 'connection_id' => 0]);
-        }
+            User::where('token', $queryarray['token'])->update([ 'connection_id' => 0, 'user_status' => 'Offline' ]);
 
+            $user_id = User::select('id')->where('token', $queryarray['token'])->get();
+
+            $data['id'] = $user_id[0]->id;
+
+            $data['status'] = 'Offline';
+
+            foreach($this->clients as $client)
+            {
+                if($client->resourceId != $conn->resourceId)
+                {
+                    $client->send(json_encode($data));
+                }
+            }
+        }
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)
