@@ -317,69 +317,86 @@
 		}
 
 		if(data.message)
+	{
+		var html = '';
+
+		if(data.from_user_id == from_user_id)
 		{
-			var html = '';
 
-			if(data.from_user_id == from_user_id)
+			var icon_style = '';
+
+			if(data.message_status == 'Not Send')
 			{
-				var icon_style = '';
+				icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check text-muted"></i></span>';
+			}
+			if(data.message_status == 'Send')
+			{
+				icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check-double text-muted"></i></span>';
+			}
 
-				if(data.message_status == 'Not Send')
-				{
-					icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check text-muted"></i></span>';
-				}
-				if(data.message_status == 'Send')
-				{
-					icon_style = '<span id="chat_status_'+data.chat_message_id+'" class="float-end"><i class="fas fa-check-double text-muted"></i></span>';
-				}
+			if(data.message_status == 'Read')
+			{
+				icon_style = '<span class="text-primary float-end" id="chat_status_'+data.chat_message_id+'"><i class="fas fa-check-double"></i></span>';
+			}
 
-				if(data.message_status == 'Read')
-				{
-					icon_style = '<span class="text-primary float-end" id="chat_status_'+data.chat_message_id+'"><i class="fas fa-check-double"></i></span>';
-				}
-
+			html += `
+			<div class="row">
+				<div class="col col-3">&nbsp;</div>
+				<div class="col col-9 alert alert-success text-dark shadow-sm">
+					`+data.message+ icon_style +`
+				</div>
+			</div>
+			`;
+		}
+		else
+		{
+			if(to_user_id != '')
+			{
 				html += `
 				<div class="row">
-					<div class="col col-3">&nbsp;</div>
-					<div class="col col-9 alert alert-success text-dark shadow-sm">
-						`+data.message+ icon_style +`
+					<div class="col col-9 alert alert-light text-dark shadow-sm">
+					`+data.message+`
 					</div>
 				</div>
 				`;
+
+				update_message_status(data.chat_message_id, from_user_id, to_user_id, 'Read');
 			}
+			// UPDATE MSG STATUS
 			else
 			{
-				if(to_user_id != '')
-				{
-					html += `
-					<div class="row">
-						<div class="col col-9 alert alert-light text-dark shadow-sm">
-						`+data.message+`
-						</div>
-					</div>
-					`;
+				var count_unread_message_element = document.getElementById('user_unread_message_'+data.from_user_id+'');
+            	if(count_unread_message_element)
+            	{
+	            	var count_unread_message = count_unread_message_element.textContent;
+	            	if(count_unread_message == '')
+	            	{
+	            		count_unread_message = parseInt(0) + 1;
+	            	}
+	            	else
+	            	{
+	            		count_unread_message = parseInt(count_unread_message) + 1;
+	            	}
+	            	count_unread_message_element.innerHTML = '<span class="badge bg-primary rounded-pill">'+count_unread_message+'</span>';
 
-					update_message_status(data.chat_message_id, from_user_id, to_user_id, 'Read');
-				}
-
-				else
-				{
-
-				}
-								
+	            	update_message_status(data.chat_message_id, data.from_user_id, data.to_user_id, 'Send');
+	            }
 			}
-
-			if(html != '')
-			{
-				var previous_chat_element = document.querySelector('#chat_history');
-
-				var chat_history_element = document.querySelector('#chat_history');
-
-				chat_history_element.innerHTML = previous_chat_element.innerHTML + html;
-				
-			}
+			// UPDATE MSG STATUS
 			
 		}
+
+		if(html != '')
+		{
+			var previous_chat_element = document.querySelector('#chat_history');
+
+			var chat_history_element = document.querySelector('#chat_history');
+
+			chat_history_element.innerHTML = previous_chat_element.innerHTML + html;
+			scroll_top();
+		}
+		
+	}
 		
 		if(data.chat_history)
 		{
