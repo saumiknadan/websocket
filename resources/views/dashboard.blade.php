@@ -248,6 +248,7 @@
 					html += `
 							&nbsp; `+user_image+`&nbsp;<b>`+data.data[count].name+`</b>
 						</div>
+						<span class="user_unread_message" data-id="`+data.data[count].id+`" id="user_unread_message_`+data.data[count].id+`"></span>
 					</a>
 					`;
 				}
@@ -379,6 +380,13 @@
 						</div>
 					</div>
 					`;
+
+					var count_unread_message_element = document.getElementById('user_unread_message_'+data.chat_history[count].from_user_id+'');
+
+					if(count_unread_message_element)
+					{
+						count_unread_message_element.innerHTML = '';
+					}
 				}
 			}
 
@@ -402,11 +410,35 @@
 					chat_status_element.innerHTML = '<i class="fas fa-check-double text-muted"></i>';
 				}
 			}
+
+			// Count unread msg
+			if(data.unread_msg)
+			{
+				var count_unread_message_element = document.getElementById('user_unread_message_'+data.from_user_id+'');
+
+				if(count_unread_message_element)
+				{
+					var count_unread_message = count_unread_message_element.textContent;
+					
+					if(count_unread_message == '')	
+					{
+						count_unread_message = parseInt(0) + 1;
+					}
+					else
+					{
+						count_unread_message = parseInt(count_unread_message) + 1;
+					}
+
+					count_unread_message_element.innerHTML = '<span class="badge bg-danger rounded-pill">'+count_unread_message+'</span>';
+				}
+			}
 		}
+	};
 
-
+	function scroll_top()
+	{
+		document.querySelector('#chat_history').scrollTop = document.querySelector('#chat_history').scrollHeight;
 	}
-
 
 	function load_unconnected_user(from_user_id)
 	{
@@ -560,6 +592,24 @@
 		};
 
 		conn.send(JSON.stringify(data));
+	}
+
+	function check_unread_message()
+	{
+		var unread_element = document.getElementsByClassName('user_unread_message');
+
+		for(var count = 0; count < unread_element.length; count++)
+		{
+			var temp_user_id = unread_element[count].dataset.id;
+
+			var data = {
+				from_user_id : from_user_id,
+				to_user_id : to_user_id,
+				type : 'check_unread_message'
+			};
+
+			conn.send(JSON.stringify(data));
+		}
 	}
 
 </script>

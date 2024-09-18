@@ -429,8 +429,52 @@ class SocketController extends Controller implements MessageComponentInterface
                     }
                 }
             }
-        }
 
+            if($data->type == 'check_unread_message')
+            {
+                $chat_data = Chat::select('id', 'from_user_id', 'to_user_id')->where('message_status', '!=', 'Read')->where('from_user_id', $data->to_user_id)->get();
+
+                /*
+                SELECT id, from_user_id, to_user_id FROM chats 
+                WHERE message_status != 'Read'
+                AND from_user_id = $data->to_user_id
+                */
+
+                $sender_connection_id = User::select('connection_id')->where('id', $data->from_user_id)->get(); //send number of unread message
+
+                $receiver_connection_id = User::select('connection_id')->where('id', $data->to_user_id)->get(); //send message read status
+
+                foreach($chat_data as $row)
+                {
+                    Chat::where('id', $row->id)->update(['message_status' => 'Send']);
+
+                    foreach($this->clients as $client)
+                    {
+                        if($client->resourceId == $sender_connection_id[0]->connection_id)
+                        {
+                            $send_data['count_unread_message'] = 1;
+
+                            $send_data['chat_message_id'] = $row->id;
+
+                            $send_data['from_user_id'] = $row->from_user_id;
+                        }
+
+                        if($client->resourceId == $receiver_connection_id[0]->connection_id)
+                        {
+                            $send_data['update_message_status'] = 'Send';
+
+                            $send_data['chat_message_id'] = $row->id;
+
+                            $send_data['unread_msg'] = 1;
+
+                            $send_data['from_user_id'] = $row->from_user_id;
+                        }
+
+                        $client->send(json_encode($send_data));
+                    }
+                }
+            }
+        }
     }
 
     public function onClose(ConnectionInterface $conn)
